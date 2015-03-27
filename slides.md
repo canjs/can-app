@@ -139,9 +139,62 @@ if(can.route.attr('page') === 'index') {
   </can-route>
 </div>
 ```
+--
+## Animations
 
+[can-animate](https://github.com/bitovi/can-animate)
+
+```
+<can-state route="">
+  <home-manager can-animate-fade-in can-animate-slide-out></home-manager>
+</can-state>
+
+<can-state page="locator">
+  <club-finder can-animate-slide-in can-animate-fade-out></club-finder>
+</can-state>
+```
+--
+### The good
+
+- Fine grained control over how to transition each top level element.
+
+### The bad
+
+- Painful if you have a bunch of `can-state` tags.
 --
 
+## `can-transition`
+
+- A 'syntax shortcut' to define the same animation behavior for a group of states.
+
+```
+<can-transition in="fade-in" out="slide-out"> 
+  <can-state page="">
+    <home-manager state="{.}"></home-manager>
+  </can-state>
+
+  <can-state page="locator">
+    <club-finder></club-finder>
+  </can-state>
+</can-transition>
+```
+--
+
+## `can-transition`
+
+- Defining a custom target
+
+```
+<can-transition in="slide-in" out="slide-out" target=".container > app-*"> 
+  <div class="container">
+    {{#if foo}} <app-foo></app-foo> {{/if}}
+    {{#if bar}} <app-bar></app-bar> {{/if}}
+    {{#if baz}} <app-baz></app-baz> {{/if}}
+  </div>
+</can-transition>
+```
+
+--
 ## Templating
 ### Stache / Mustache
 

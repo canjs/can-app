@@ -585,7 +585,13 @@ pre {
 </section>
   </div>
   <div class="slide hidden" id="slide-2">
-    <section class="slide-content"><h2 id="an-intro-slide">An intro slide</h2>
+    <section class="slide-content"><h2 id="problems-to-solve">Problems to Solve</h2>
+<ul>
+<li>Bootstrapping Application</li>
+<li>Make routing easier</li>
+<li>Transitioning between pages</li>
+<li>Allow Components to be Written into DOM</li>
+</ul>
 </section>
   </div>
   <div class="slide hidden" id="slide-3">
@@ -696,6 +702,59 @@ Con: Route definition in template</p>
 </section>
   </div>
   <div class="slide hidden" id="slide-11">
+    <section class="slide-content"><h2 id="animations">Animations</h2>
+<p><a href="https://github.com/bitovi/can-animate">can-animate</a></p>
+<pre><code>&lt;can-state route=&quot;&quot;&gt;
+  &lt;home-manager can-animate-fade-in can-animate-slide-out&gt;&lt;/home-manager&gt;
+&lt;/can-state&gt;
+
+&lt;can-state page=&quot;locator&quot;&gt;
+  &lt;club-finder can-animate-slide-in can-animate-fade-out&gt;&lt;/club-finder&gt;
+&lt;/can-state&gt;</code></pre>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-12">
+    <section class="slide-content"><h3 id="the-good">The good</h3>
+<ul>
+<li>Fine grained control over how to transition each top level element.</li>
+</ul>
+<h3 id="the-bad">The bad</h3>
+<ul>
+<li>Painful if you have a bunch of <code>can-state</code> tags.</li>
+</ul>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-13">
+    <section class="slide-content"><h2 id="-can-transition-"><code>can-transition</code></h2>
+<ul>
+<li>A &#39;syntax shortcut&#39; to define the same animation behavior for a group of states.</li>
+</ul>
+<pre><code>&lt;can-transition in=&quot;fade-in&quot; out=&quot;slide-out&quot;&gt; 
+  &lt;can-state page=&quot;&quot;&gt;
+    &lt;home-manager state=&quot;{.}&quot;&gt;&lt;/home-manager&gt;
+  &lt;/can-state&gt;
+
+  &lt;can-state page=&quot;locator&quot;&gt;
+    &lt;club-finder&gt;&lt;/club-finder&gt;
+  &lt;/can-state&gt;
+&lt;/can-transition&gt;</code></pre>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-14">
+    <section class="slide-content"><h2 id="-can-transition-"><code>can-transition</code></h2>
+<ul>
+<li>Defining a custom target</li>
+</ul>
+<pre><code>&lt;can-transition in=&quot;slide-in&quot; out=&quot;slide-out&quot; target=&quot;.container &gt; app-*&quot;&gt; 
+  &lt;div class=&quot;container&quot;&gt;
+    {{#if foo}} &lt;app-foo&gt;&lt;/app-foo&gt; {{/if}}
+    {{#if bar}} &lt;app-bar&gt;&lt;/app-bar&gt; {{/if}}
+    {{#if baz}} &lt;app-baz&gt;&lt;/app-baz&gt; {{/if}}
+  &lt;/div&gt;
+&lt;/can-transition&gt;</code></pre>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-15">
     <section class="slide-content"><h2 id="templating">Templating</h2>
 <h3 id="stache-mustache">Stache / Mustache</h3>
 <h4 id="the-good">The Good</h4>
@@ -704,7 +763,7 @@ Con: Route definition in template</p>
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-12">
+  <div class="slide hidden" id="slide-16">
     <section class="slide-content"><h3 id="stache-mustache">Stache / Mustache</h3>
 <h4 id="the-bad">The Bad</h4>
 <ol>
@@ -721,7 +780,7 @@ Con: Route definition in template</p>
 </ol>
 </section>
   </div>
-  <div class="slide hidden" id="slide-13">
+  <div class="slide hidden" id="slide-17">
     <section class="slide-content"><h3 id="html-based-templates">HTML-based Templates</h3>
 <h4 id="the-good">The Good</h4>
 <ul>
@@ -736,7 +795,7 @@ Con: Route definition in template</p>
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-14">
+  <div class="slide hidden" id="slide-18">
     <section class="slide-content"><h3 id="-key-"><code>{{key}}</code></h3>
 <ul>
 <li><code>{{key}}</code> - Angular</li>
@@ -744,7 +803,7 @@ Con: Route definition in template</p>
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-15">
+  <div class="slide hidden" id="slide-19">
     <section class="slide-content"><h3 id="-each-"><code>{{#each}}</code></h3>
 <h4 id="them">Them</h4>
 <ul>
@@ -762,7 +821,7 @@ Con: Route definition in template</p>
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-16">
+  <div class="slide hidden" id="slide-20">
     <section class="slide-content"><h3 id="-if-if-"><code>{{#if}} / {{^if}}</code></h3>
 <ul>
 <li><code>if=&quot;expr&quot;</code> - Same problem as repeat</li>
@@ -775,7 +834,7 @@ Con: Route definition in template</p>
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-17">
+  <div class="slide hidden" id="slide-21">
     <section class="slide-content"><h3 id="exporting-component-s-viewmodel">Exporting component&#39;s viewModel</h3>
 <p><a href="https://github.com/bitovi/canjs/issues/1362">Issue #1362</a></p>
 <ul>
@@ -793,8 +852,9 @@ Con: Route definition in template</p>
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-18">
-    <section class="slide-content"></section>
+  <div class="slide hidden" id="slide-22">
+    <section class="slide-content"><h2 id="implementing-templates">Implementing Templates</h2>
+</section>
   </div>
 
 
