@@ -609,12 +609,16 @@ pre {
 <ul>
 <li>How to compose those components into an application?</li>
 <li>Application state not a &quot;first class citizen&quot;</li>
+<li>Application bootstrap not easily testable</li>
 </ul>
 </section>
   </div>
   <div class="slide hidden" id="slide-5">
     <section class="slide-content"><h2 id="application-routing">Application routing</h2>
-<h2 id="the-lazy-way">The lazy way</h2>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-6">
+    <section class="slide-content"><h2 id="the-lazy-way">The lazy way</h2>
 <pre><code class="lang-javascript"><span class="keyword">const</span> renderer = can.view.stache(<span class="string">'&lt;app-post post="{post}"&gt;&lt;/app-post&gt;'</span>);
 
 router(<span class="string">'/posts/:id'</span>, data =&gt; {
@@ -624,7 +628,7 @@ router(<span class="string">'/posts/:id'</span>, data =&gt; {
 });</code></pre>
 </section>
   </div>
-  <div class="slide hidden" id="slide-6">
+  <div class="slide hidden" id="slide-7">
     <section class="slide-content"><h2 id="why-lazy-">Why lazy?</h2>
 <h3 id="the-good">The good</h3>
 <ul>
@@ -638,64 +642,119 @@ router(<span class="string">'/posts/:id'</span>, data =&gt; {
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-7">
+  <div class="slide hidden" id="slide-8">
     <section class="slide-content"><h2 id="can-appstate">can.AppState</h2>
 <p>A global application state object</p>
-<pre><code class="lang-javascript">export <span class="keyword">default</span> <span class="keyword">new</span> can.AppState({
+<pre><code class="lang-javascript">export <span class="keyword">default</span> can.AppState.extend({
   define: {
     post: {
-      set(id) {
-        <span class="keyword">return</span> Post.findOne({ id });
-      },
-
-      serialize() {
-        <span class="keyword">return</span> <span class="keyword">this</span>.attr(<span class="string">'post'</span>).value.attr(<span class="string">'id'</span>);
+      serialize: <span class="literal">false</span>,
+      get(id) {
+        <span class="keyword">return</span> Post.findOne({ id: <span class="keyword">this</span>.attr(<span class="string">'postId'</span>) });
       }
     }
   }
 });</code></pre>
 </section>
   </div>
-  <div class="slide hidden" id="slide-8">
-    <section class="slide-content"><h2 id="-can-route-"><code>&lt;can-route&gt;</code></h2>
-<pre><code>&lt;can-route url=&quot;&quot;&gt;
-  &lt;a href=&quot;post/1&quot;&gt;A blog post&lt;/a&gt;
-&lt;/can-route&gt;
-&lt;can-route url=&quot;posts/:id&quot;&gt;
-  {{#if post.isPending}}
-    &lt;app-loader&gt;Loading blog post&lt;/app-loader&gt;
-  {{else}}
-    &lt;app-post post=&quot;{post.value}&quot;&gt;&lt;/app-post&gt;
-  {{/if}}
-&lt;/can-route&gt;</code></pre>
-<p>Pro: Separate application state
-Con: Route definition in template</p>
-</section>
-  </div>
   <div class="slide hidden" id="slide-9">
-    <section class="slide-content"><h2 id="route-matching-problems">Route matching problems</h2>
-<pre><code class="lang-javascript">can.route(<span class="string">':page/:id'</span>, { page: <span class="string">'index'</span> });
+    <section class="slide-content"><h2 id="appstate-and-routing">AppState and routing</h2>
+<pre><code class="lang-javascript"><span class="keyword">const</span> main = can.mustache(<span class="string">'&lt;app-main&gt;&lt;/app-main&gt;'</span>);
+<span class="keyword">const</span> blog = can.mustache(<span class="string">'&lt;app-post post="{post}"&gt;&lt;/app-post&gt;'</span>);
+<span class="keyword">const</span> appState = <span class="keyword">new</span> AppState();
+
+can.route.map(appState);
+
+can.route(<span class="string">':page/:postId'</span>, { page: <span class="string">'index'</span> });
 
 <span class="keyword">if</span>(can.route.attr(<span class="string">'page'</span>) === <span class="string">'index'</span>) {
-
+  $(<span class="string">'#main'</span>).html(main(appState));
 } <span class="keyword">else</span> <span class="keyword">if</span>(can.route.attr(<span class="string">'page'</span>) === <span class="string">'blog'</span>) {
-
+  System.import(<span class="string">'app/blog'</span>).then(() =&gt; $(<span class="string">'#main'</span>).html(blog(appState)));
 }</code></pre>
 </section>
   </div>
   <div class="slide hidden" id="slide-10">
-    <section class="slide-content"><h2 id="-can-state-"><code>&lt;can-state&gt;</code></h2>
-<pre><code>&lt;div class=&quot;container&quot;&gt;
-  &lt;can-state route=&quot;&quot; can-animate-out=&quot;slideRight&quot;&gt;
-    &lt;a href=&quot;post/1&quot;&gt;A blog post&lt;/a&gt;
-  &lt;/can-route&gt;
-  &lt;can-state page=&quot;post&quot; can-animate-in=&quot;slideLeft&quot; can-animate-out=&quot;slideRight&quot;&gt;
-    &lt;app-post post=&quot;{id}&quot;&gt;&lt;/app-post&gt;
-  &lt;/can-route&gt;
-&lt;/div&gt;</code></pre>
+    <section class="slide-content"><h2 id="-can-route-"><code>&lt;can-route&gt;</code></h2>
+<pre><code class="lang-javascript">&lt;can-route url=<span class="string">""</span>&gt;
+  <span class="xml"><span class="tag">&lt;<span class="title">a</span> <span class="attribute">href</span>=<span class="value">"{{makeUrl 'post' '1'}}"</span>&gt;</span>A blog post<span class="tag">&lt;/<span class="title">a</span>&gt;</span>
+<span class="tag">&lt;/<span class="title">can-route</span>&gt;</span>
+<span class="tag">&lt;<span class="title">can-route</span> <span class="attribute">url</span>=<span class="value">"posts/:post"</span>&gt;</span>
+  {{#if post.isPending}}
+    <span class="tag">&lt;<span class="title">app-loader</span>&gt;</span>Loading blog post<span class="tag">&lt;/<span class="title">app-loader</span>&gt;</span>
+  {{else}}
+    <span class="tag">&lt;<span class="title">app-blog</span> <span class="attribute">post</span>=<span class="value">"{post.value}"</span>&gt;</span><span class="tag">&lt;/<span class="title">app-blog</span>&gt;</span>
+  {{/if}}
+<span class="tag">&lt;/<span class="title">can-route</span>&gt;</span></span></code></pre>
+<ul>
+<li><strong>Good:</strong> Separate application state</li>
+<li><strong>Bad:</strong> Route definition in template</li>
+</ul>
 </section>
   </div>
   <div class="slide hidden" id="slide-11">
+    <section class="slide-content"><h2 id="routes-in-appstate">Routes in appState</h2>
+<pre><code class="lang-javascript"><span class="comment">// app/main.js</span>
+export <span class="keyword">default</span> can.AppState.extend({
+  define: {
+    post: {
+      serialize: <span class="literal">false</span>,
+      get(id) {
+        <span class="keyword">return</span> Post.findOne({ id: <span class="keyword">this</span>.attr(<span class="string">'postId'</span>) });
+      }
+    }
+  },
+  routes: {
+    <span class="string">':page/:postId'</span>: {
+      page: <span class="string">'index'</span>
+    }
+  }
+});</code></pre>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-12">
+    <section class="slide-content"><h2 id="-can-state-"><code>&lt;can-state&gt;</code></h2>
+<p>Component for matching properties, animating transitions and importing modules.</p>
+<pre><code class="lang-javascript">&lt;div class=<span class="string">"container"</span>&gt;
+  <span class="xml"><span class="tag">&lt;<span class="title">can-state</span> <span class="attribute">page</span>=<span class="value">"index"</span> <span class="attribute">can-animate-in</span>=<span class="value">"fadeIn"</span> <span class="attribute">can-animate-out</span>=<span class="value">"slideRight"</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">a</span> <span class="attribute">href</span>=<span class="value">"{{makeUrl 'blog' '1'}}"</span>&gt;</span>A blog post<span class="tag">&lt;/<span class="title">a</span>&gt;</span>
+  <span class="tag">&lt;/<span class="title">can-state</span>&gt;</span>
+  <span class="tag">&lt;<span class="title">can-state</span> <span class="attribute">page</span>=<span class="value">"blog"</span> <span class="attribute">can-import</span>=<span class="value">"app/blog"</span>
+      <span class="attribute">can-animate-in</span>=<span class="value">"slideLeft"</span> <span class="attribute">can-animate-out</span>=<span class="value">"fadeOut"</span>&gt;</span>
+    {{#if post.isPending}}
+      <span class="tag">&lt;<span class="title">app-loader</span>&gt;</span>Loading blog post<span class="tag">&lt;/<span class="title">app-loader</span>&gt;</span>
+    {{else}}
+      <span class="tag">&lt;<span class="title">app-blog</span> <span class="attribute">post</span>=<span class="value">"{post.value}"</span>&gt;</span><span class="tag">&lt;/<span class="title">app-blog</span>&gt;</span>
+    {{/if}}
+  <span class="tag">&lt;/<span class="title">can-state</span>&gt;</span>
+<span class="tag">&lt;/<span class="title">div</span>&gt;</span></span></code></pre>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-13">
+    <section class="slide-content"><h2 id="index-html">index.html</h2>
+<pre><code class="lang-javascript">&lt;!DOCTYPE html&gt;
+<span class="xml"><span class="tag">&lt;<span class="title">html</span>&gt;</span>
+  <span class="tag">&lt;<span class="title">head</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">title</span>&gt;</span>Bitovi Blog<span class="tag">&lt;/<span class="title">title</span>&gt;</span>
+  <span class="tag">&lt;/<span class="title">head</span>&gt;</span>
+  <span class="tag">&lt;<span class="title">body</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"node_modules/steal/steal.js"</span> <span class="attribute">data-main</span>=<span class="value">"can"</span>&gt;</span><span class="javascript"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">script</span> <span class="attribute">type</span>=<span class="value">"text/stache"</span> <span class="attribute">autorender</span>&gt;</span><span class="undefined">
+      &lt;h1&gt;Blog&lt;/h1&gt;
+      &lt;can-import from="app/main" class="container"&gt;
+        &lt;can-state page="index"&gt;
+          &lt;a href="{{makeUrl 'blog' '1'}}"&gt;A blog post&lt;/a&gt;
+        &lt;/can-state&gt;
+        &lt;can-state page="blog" can-import="app/blog"&gt;
+          &lt;app-blog post="{post}"&gt;&lt;/app-blog&gt;
+        &lt;/can-state&gt;
+      &lt;/can-import&gt;
+    </span><span class="tag">&lt;/<span class="title">script</span>&gt;</span>
+  <span class="tag">&lt;/<span class="title">body</span>&gt;</span>
+<span class="tag">&lt;/<span class="title">html</span>&gt;</span></span></code></pre>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-14">
     <section class="slide-content"><h2 id="templating">Templating</h2>
 <h3 id="stache-mustache">Stache / Mustache</h3>
 <h4 id="the-good">The Good</h4>
@@ -704,7 +763,7 @@ Con: Route definition in template</p>
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-12">
+  <div class="slide hidden" id="slide-15">
     <section class="slide-content"><h3 id="stache-mustache">Stache / Mustache</h3>
 <h4 id="the-bad">The Bad</h4>
 <ol>
@@ -721,7 +780,7 @@ Con: Route definition in template</p>
 </ol>
 </section>
   </div>
-  <div class="slide hidden" id="slide-13">
+  <div class="slide hidden" id="slide-16">
     <section class="slide-content"><h3 id="html-based-templates">HTML-based Templates</h3>
 <h4 id="the-good">The Good</h4>
 <ul>
@@ -736,7 +795,7 @@ Con: Route definition in template</p>
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-14">
+  <div class="slide hidden" id="slide-17">
     <section class="slide-content"><h3 id="-key-"><code>{{key}}</code></h3>
 <ul>
 <li><code>{{key}}</code> - Angular</li>
@@ -744,7 +803,7 @@ Con: Route definition in template</p>
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-15">
+  <div class="slide hidden" id="slide-18">
     <section class="slide-content"><h3 id="-each-"><code>{{#each}}</code></h3>
 <h4 id="them">Them</h4>
 <ul>
@@ -762,7 +821,7 @@ Con: Route definition in template</p>
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-16">
+  <div class="slide hidden" id="slide-19">
     <section class="slide-content"><h3 id="-if-if-"><code>{{#if}} / {{^if}}</code></h3>
 <ul>
 <li><code>if=&quot;expr&quot;</code> - Same problem as repeat</li>
@@ -775,7 +834,7 @@ Con: Route definition in template</p>
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-17">
+  <div class="slide hidden" id="slide-20">
     <section class="slide-content"><h3 id="exporting-component-s-viewmodel">Exporting component&#39;s viewModel</h3>
 <p><a href="https://github.com/bitovi/canjs/issues/1362">Issue #1362</a></p>
 <ul>
@@ -793,7 +852,7 @@ Con: Route definition in template</p>
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-18">
+  <div class="slide hidden" id="slide-21">
     <section class="slide-content"></section>
   </div>
 

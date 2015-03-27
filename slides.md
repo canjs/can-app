@@ -33,10 +33,13 @@ logo: theme/logo.png
 
 - How to compose those components into an application?
 - Application state not a "first class citizen"
+- Application bootstrap not easily testable
 
 --
 
 ## Application routing
+
+--
 
 ## The lazy way
 
@@ -71,15 +74,12 @@ router('/posts/:id', data => {
 A global application state object
 
 ```javascript
-export default new can.AppState({
+export default can.AppState.extend({
   define: {
     post: {
-      set(id) {
-        return Post.findOne({ id });
-      },
-
-      serialize() {
-        return this.attr('post').value.attr('id');
+      serialize: false,
+      get(id) {
+        return Post.findOne({ id: this.attr('postId') });
       }
     }
   }
@@ -88,51 +88,114 @@ export default new can.AppState({
 
 --
 
+## AppState and routing
+
+```javascript
+const main = can.mustache('<app-main></app-main>');
+const blog = can.mustache('<app-post post="{post}"></app-post>');
+const appState = new AppState();
+
+can.route.map(appState);
+
+can.route(':page/:postId', { page: 'index' });
+
+if(can.route.attr('page') === 'index') {
+  $('#main').html(main(appState));
+} else if(can.route.attr('page') === 'blog') {
+  System.import('app/blog').then(() => $('#main').html(blog(appState)));
+}
+```
+
+--
+
 ## `<can-route>`
 
-```
+```javascript
 <can-route url="">
-  <a href="post/1">A blog post</a>
+  <a href="{{makeUrl 'post' '1'}}">A blog post</a>
 </can-route>
-<can-route url="posts/:id">
+<can-route url="posts/:post">
   {{#if post.isPending}}
     <app-loader>Loading blog post</app-loader>
   {{else}}
-    <app-post post="{post.value}"></app-post>
+    <app-blog post="{post.value}"></app-blog>
   {{/if}}
 </can-route>
 ```
 
-Pro: Separate application state
-Con: Route definition in template
+- __Good:__ Separate application state
+- __Bad:__ Route definition in template
 
 --
 
-## Route matching problems
+## Routes in appState
 
 ```javascript
-can.route(':page/:id', { page: 'index' });
-
-if(can.route.attr('page') === 'index') {
-
-} else if(can.route.attr('page') === 'blog') {
-
-}
+// app/main.js
+export default can.AppState.extend({
+  define: {
+    post: {
+      serialize: false,
+      get(id) {
+        return Post.findOne({ id: this.attr('postId') });
+      }
+    }
+  },
+  routes: {
+    ':page/:postId': {
+      page: 'index'
+    }
+  }
+});
 ```
 
 --
 
 ## `<can-state>`
 
-```
+Component for matching properties, animating transitions and importing modules.
+
+```javascript
 <div class="container">
-  <can-state route="" can-animate-out="slideRight">
-    <a href="post/1">A blog post</a>
-  </can-route>
-  <can-state page="post" can-animate-in="slideLeft" can-animate-out="slideRight">
-    <app-post post="{id}"></app-post>
-  </can-route>
+  <can-state page="index" can-animate-in="fadeIn" can-animate-out="slideRight">
+    <a href="{{makeUrl 'blog' '1'}}">A blog post</a>
+  </can-state>
+  <can-state page="blog" can-import="app/blog"
+      can-animate-in="slideLeft" can-animate-out="fadeOut">
+    {{#if post.isPending}}
+      <app-loader>Loading blog post</app-loader>
+    {{else}}
+      <app-blog post="{post.value}"></app-blog>
+    {{/if}}
+  </can-state>
 </div>
+```
+
+--
+
+## index.html
+
+```javascript
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Bitovi Blog</title>
+  </head>
+  <body>
+    <script src="node_modules/steal/steal.js" data-main="can"></script>
+    <script type="text/stache" autorender>
+      <h1>Blog</h1>
+      <can-import from="app/main" class="container">
+        <can-state page="index">
+          <a href="{{makeUrl 'blog' '1'}}">A blog post</a>
+        </can-state>
+        <can-state page="blog" can-import="app/blog">
+          <app-blog post="{post}"></app-blog>
+        </can-state>
+      </can-import>
+    </script>
+  </body>
+</html>
 ```
 
 --
