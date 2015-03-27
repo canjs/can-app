@@ -584,6 +584,107 @@ pre {
     <section class="slide-content"><h1 id="can-app">can.App</h1>
 </section>
   </div>
+  <div class="slide hidden" id="slide-2">
+    <section class="slide-content"><h2 id="templating">Templating</h2>
+<h3 id="stache-mustache">Stache / Mustache</h3>
+<h4 id="the-good">The Good</h4>
+<ul>
+<li>Elegantly solves building DOM from strings.</li>
+</ul>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-3">
+    <section class="slide-content"><h3 id="stache-mustache">Stache / Mustache</h3>
+<h4 id="the-bad">The Bad</h4>
+<ol>
+<li>Cannot be written directly in HTML.<ul>
+<li>Some uses aren&#39;t possible<ul>
+<li>Wrapping attributes: <code>{{#if true}}foo=&quot;bar&quot;{{/if}}</code></li>
+<li>Can&#39;t do <code>&lt;tbody&gt;{{#each}}&lt;tr&gt;&lt;/tr&gt;{{/each}}&lt;/tbody&gt;</code></li>
+</ul>
+</li>
+<li>Flash of unstyled content</li>
+<li>Cannot use in <code>&lt;template&gt;</code> (lose advantages that has)</li>
+</ul>
+</li>
+</ol>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-4">
+    <section class="slide-content"><h3 id="html-based-templates">HTML-based Templates</h3>
+<h4 id="the-good">The Good</h4>
+<ul>
+<li>Can use directly in the DOM.</li>
+</ul>
+<h4 id="the-bad">The Bad</h4>
+<ul>
+<li>HTML is a bit limited for building DOM structure.<ul>
+<li>Everything is an Element, Attribute, or TextNode.</li>
+</ul>
+</li>
+</ul>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-5">
+    <section class="slide-content"><h3 id="-key-"><code>{{key}}</code></h3>
+<ul>
+<li><code>{{key}}</code> - Angular</li>
+<li><code>${key}</code> - ES6 string templating</li>
+</ul>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-6">
+    <section class="slide-content"><h3 id="-each-"><code>{{#each}}</code></h3>
+<h4 id="them">Them</h4>
+<ul>
+<li><code>repeat=&quot;key&quot;</code> - Angular / Polymer<ul>
+<li><code>each=&quot;key&quot;</code></li>
+<li><code>for-each=&quot;key&quot;</code></li>
+</ul>
+</li>
+<li><code>repeat=&quot;k of key&quot;</code> - Localized naming, introduces expressions</li>
+</ul>
+<h4 id="us">Us</h4>
+<ul>
+<li><code>&lt;can-each&gt;</code> - Easiest to implement</li>
+<li><code>@each=&quot;key&quot;</code></li>
+</ul>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-7">
+    <section class="slide-content"><h3 id="-if-if-"><code>{{#if}} / {{^if}}</code></h3>
+<ul>
+<li><code>if=&quot;expr&quot;</code> - Same problem as repeat</li>
+<li><code>&lt;can-if&gt;</code> - Only for blocks, same problem as <code>{{#if}}</code></li>
+</ul>
+<h4 id="attributes">Attributes</h4>
+<ul>
+<li><code>class=&quot;{{#if expr}}sidebar{{/if}}&quot;</code></li>
+<li><code>class=&quot;{expr ? &quot;sidebar&quot; : &quot;&quot;}&quot;</code> - ternary</li>
+</ul>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-8">
+    <section class="slide-content"><h3 id="exporting-component-s-viewmodel">Exporting component&#39;s viewModel</h3>
+<p><a href="https://github.com/bitovi/canjs/issues/1362">Issue #1362</a></p>
+<ul>
+<li><code>can-scope=&quot;name&quot;</code> - Current proposal<ul>
+<li>Get a specific property of the scope: <code>can-scope-*=&quot;&quot;</code>, ex: <code>&lt;todos can-scope-length=&quot;todosCount&quot;&gt;</code></li>
+</ul>
+</li>
+<li><code>ref=&quot;name&quot;</code> - problem: because we pass data in attributes hard to add non <code>can-</code> attrs.</li>
+<li><code>@bind=&quot;name&quot;</code></li>
+<li><code>#name</code> - Angular: <code>&lt;todos #todos /&gt;</code></li>
+<li><code>[length]=&quot;todosCount&quot;</code> - Extract a specific property</li>
+<li><code>[]=&quot;name&quot;</code> - Full viewModel</li>
+<li><code>[.]=&quot;name&quot;</code> - full vm</li>
+<li><code>[@viewModel]=&quot;name&quot;</code> -extract full vm (<code>[@events]=&quot;todosEvents&quot;</code>)</li>
+</ul>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-9">
+    <section class="slide-content"></section>
+  </div>
 
 
   <script type="text/javascript">
