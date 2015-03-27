@@ -13,9 +13,9 @@ logo: theme/logo.png
 ## Problems to Solve
 
 * Bootstrapping Application
-* Make routing easier
+* Make routing / application state clearer
 * Transitioning between pages
-* Allow Components to be Written into DOM
+* Making bootstrapping more declarative
 
 --
 
@@ -276,7 +276,4 @@ if(can.route.attr('page') === 'index') {
 * `[@viewModel]="name"` -extract full vm (`[@events]="todosEvents"`)
 
 --
-
-## Implementing Templates
-
 
