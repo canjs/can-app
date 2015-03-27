@@ -1,4 +1,4 @@
-title: can.App
+title: SPA
 output: index.html
 theme: theme
 controls: false
@@ -6,7 +6,134 @@ logo: theme/logo.png
 
 --
 
-# can.App
+# Single Page Applications
+
+--
+
+## An intro slide
+
+--
+
+# can.Application
+
+--
+
+## Status
+
+#### The good
+
+- Splitting your application into small components
+  - Components
+  - Demo page
+  - Tests
+  - Documentation
+- NPM
+
+#### The bad
+
+- How to compose those components into an application?
+- Application state not a "first class citizen"
+
+--
+
+## Application routing
+
+## The lazy way
+
+```javascript
+const renderer = can.view.stache('<app-post post="{post}"></app-post>');
+
+router('/posts/:id', data => {
+  Post.findOne({
+    id: data.id
+  }).then(post => $('#main').html(renderer({ post })));
+});
+```
+
+--
+
+## Why lazy?
+
+### The good
+
+- Easy to understand and set up
+
+### The bad
+
+- Not bidirectional
+- Route first development: You think about URL design instead of application state.
+- Application state (and rendering) is tied to route handlers.
+
+--
+
+## can.AppState
+
+A global application state object
+
+```javascript
+export default new can.AppState({
+  define: {
+    post: {
+      set(id) {
+        return Post.findOne({ id });
+      },
+
+      serialize() {
+        return this.attr('post').value.attr('id');
+      }
+    }
+  }
+});
+```
+
+--
+
+## `<can-route>`
+
+```
+<can-route url="">
+  <a href="post/1">A blog post</a>
+</can-route>
+<can-route url="posts/:id">
+  {{#if post.isPending}}
+    <app-loader>Loading blog post</app-loader>
+  {{else}}
+    <app-post post="{post.value}"></app-post>
+  {{/if}}
+</can-route>
+```
+
+Pro: Separate application state
+Con: Route definition in template
+
+--
+
+## Route matching problems
+
+```javascript
+can.route(':page/:id', { page: 'index' });
+
+if(can.route.attr('page') === 'index') {
+
+} else if(can.route.attr('page') === 'blog') {
+
+}
+```
+
+--
+
+## `<can-state>`
+
+```
+<div class="container">
+  <can-state route="" can-animate-out="slideRight">
+    <a href="post/1">A blog post</a>
+  </can-route>
+  <can-state page="post" can-animate-in="slideLeft" can-animate-out="slideRight">
+    <app-post post="{id}"></app-post>
+  </can-route>
+</div>
+```
 
 --
 

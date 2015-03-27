@@ -21,42 +21,39 @@
 ## The lazy way
 
 ```js
-app.route('/posts/:id', function(data) {
+const renderer = can.view.stache('<app-post post="{post}"></app-post>');
+
+router('/posts/:id', data => {
   Post.findOne({
     id: data.id
-  }).then(function(post) {
-    $('#main').html(can.view.stache('<app-post post="{post}"></app-post>', {
-      post: post
-    }));
-  });
+  }).then(post => $('#main').html(renderer({ post })));
 });
 ```
 
-Pro:
+## Why lazy?
 
-Easy to understand and set up
+__The good__
 
-Con:
+- Easy to understand and set up
 
-Route first development: You think about URL design instead of the
-overall state of your application. Application state is tied
-to route handlers.
+__The bad__
+
+- Route first development: You think about URL design instead of application state.
+- Application state is tied to route handlers.
 
 ## can.AppState
+
+A global application state object
 
 ```js
 export default new can.AppState({
   define: {
     post: {
-      set: function(post) {
-        if(post instanceof Post) {
-          return post;
-        }
-
-        return Post.findOne({ id: id });
+      set(id) {
+        return Post.findOne({ id });
       },
 
-      serialize: function() {
+      serialize() {
         return this.value.attr('id');
       }
     }
@@ -71,22 +68,40 @@ export default new can.AppState({
   <a href="post/1">A blog post</a>
 </can-route>
 <can-route url="posts/:id">
-  <app-post post="{post}"></app-post>
+  {{#if post.isPending}}
+    <app-loader>Loading blog post</app-loader>
+  {{else}}
+    <app-post post="{post.value}"></app-post>
+  {{/if}}
 </can-route>
 ```
 
 Pro: Separate application state
 Con: Route definition in template
 
+## Route matching problems
+
+```js
+can.route(':page/:id', { page: 'index' });
+
+if(can.route.attr('page') === 'index') {
+
+} else if(can.route.attr('page') === 'blog') {
+
+}
+```
+
 ## `<can-state>`
 
 ```html
-<can-state route="">
-  <a href="post/1">A blog post</a>
-</can-route>
-<can-state page="post">
-  <app-post post="{id}"></app-post>
-</can-route>
+<div class="container">
+  <can-state route="" can-animate-out="slideRight">
+    <a href="post/1">A blog post</a>
+  </can-route>
+  <can-state page="post" can-animate-in="slideLeft" can-animate-out="slideRight">
+    <app-post post="{id}"></app-post>
+  </can-route>
+</div>
 ```
 
 ## can.AppState
