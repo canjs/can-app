@@ -163,6 +163,100 @@ if(can.route.attr('page') === 'index') {
 - Painful if you have a bunch of `can-state` tags.
 --
 
+## What our competitors do? 
+
+### Ember 
+
+[liquid-fire](http://ef4.github.io/liquid-fire/#/)
+
+- Transitions are implemented within the view (`Template helpers`), 
+the 'kind of' transition is defined in the `Transition map` which maps
+routes to transitions.
+
+```
+{{#liquid-outlet}} -> Transitions between routes.
+{{#liquid-with}}   -> Transitions between models or contexts within a single route.
+{{#liquid-bind}}   -> Updates to simple bound values.
+{{#liquid-if}}     -> Switching between true and false branches in an #if statement.
+{{#liquid-spacer}} -> Provides a smoothly growing/shrinking container that 
+                      animates whenever its contained DOM mutates.
+```
+--
+### Transition map
+
+```
+export default function(){
+  this.transition(
+    this.fromRoute('people.index'),
+    this.toRoute('people.detail'),
+    this.use('toLeft'),
+    this.reverse('toRight')
+  );
+};
+```
+--
+### Defining custom transitions
+
+```
+import { animate, stop } from "liquid-fire";
+
+export default function fade(oldView, insertNewView) {
+  stop(oldView);
+  return animate(oldView, {opacity: 0})
+    .then(insertNewView)
+    .then(function(newView){
+      return animate(newView, {opacity: [1, 0]});
+    });
+}
+```
+--
+
+### Angular 
+
+[ngAnimate](https://docs.angularjs.org/api/ngAnimate)
+
+- Core directives provide hooks for css animations, basically it just 
+adds a `ng-enter` or `ng-leave` class when element is being either 
+added to or removed from the DOM.
+
+```
+<div ng-repeat="item in items" class="repeated-item">
+  {{ item.id }}
+</div>
+```
+
+```
+.repeated-item.ng-enter, .repeated-item.ng-move { /* transition rules */ }
+.repeated-item.ng-leave { /* transition rules */ }
+```
+--
+
+### React
+
+- Heavily inspired in `ngAnimate`, also relies on CSS classes.
+
+```
+var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
+var TodoList = React.createClass({
+  render: function() {
+    return (
+      <div>
+        <button onClick={this.handleAdd}>Add Item</button>
+        <ReactCSSTransitionGroup transitionName="example">
+          {items}
+        </ReactCSSTransitionGroup>
+      </div>
+    );
+  }
+});
+```
+
+```
+.example-enter { /* item added to the DOM */ }
+.example-leave { /* item removed from the DOM */ }
+```
+--
+
 ## `can-transition`
 
 - A 'syntax shortcut' to define the same animation behavior for a group of states.
@@ -193,7 +287,6 @@ if(can.route.attr('page') === 'index') {
   </div>
 </can-transition>
 ```
-
 --
 ## Templating
 ### Stache / Mustache

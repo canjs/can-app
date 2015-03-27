@@ -725,6 +725,86 @@ Con: Route definition in template</p>
 </section>
   </div>
   <div class="slide hidden" id="slide-13">
+    <section class="slide-content"><h2 id="what-our-competitors-do-">What our competitors do?</h2>
+<h3 id="ember">Ember</h3>
+<p><a href="http://ef4.github.io/liquid-fire/#/">liquid-fire</a></p>
+<ul>
+<li>Transitions are implemented within the view (<code>Template helpers</code>), 
+the &#39;kind of&#39; transition is defined in the <code>Transition map</code> which maps
+routes to transitions.</li>
+</ul>
+<pre><code>{{#liquid-outlet}} -&gt; Transitions between routes.
+{{#liquid-with}}   -&gt; Transitions between models or contexts within a single route.
+{{#liquid-bind}}   -&gt; Updates to simple bound values.
+{{#liquid-if}}     -&gt; Switching between true and false branches in an #if statement.
+{{#liquid-spacer}} -&gt; Provides a smoothly growing/shrinking container that 
+                      animates whenever its contained DOM mutates.</code></pre>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-14">
+    <section class="slide-content"><h3 id="transition-map">Transition map</h3>
+<pre><code>export default function(){
+  this.transition(
+    this.fromRoute(&#39;people.index&#39;),
+    this.toRoute(&#39;people.detail&#39;),
+    this.use(&#39;toLeft&#39;),
+    this.reverse(&#39;toRight&#39;)
+  );
+};</code></pre>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-15">
+    <section class="slide-content"><h3 id="defining-custom-transitions">Defining custom transitions</h3>
+<pre><code>import { animate, stop } from &quot;liquid-fire&quot;;
+
+export default function fade(oldView, insertNewView) {
+  stop(oldView);
+  return animate(oldView, {opacity: 0})
+    .then(insertNewView)
+    .then(function(newView){
+      return animate(newView, {opacity: [1, 0]});
+    });
+}</code></pre>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-16">
+    <section class="slide-content"><h3 id="angular">Angular</h3>
+<p><a href="https://docs.angularjs.org/api/ngAnimate">ngAnimate</a></p>
+<ul>
+<li>Core directives provide hooks for css animations, basically it just 
+adds a <code>ng-enter</code> or <code>ng-leave</code> class when element is being either 
+added to or removed from the DOM.</li>
+</ul>
+<pre><code>&lt;div ng-repeat=&quot;item in items&quot; class=&quot;repeated-item&quot;&gt;
+  {{ item.id }}
+&lt;/div&gt;</code></pre>
+<pre><code>.repeated-item.ng-enter, .repeated-item.ng-move { /* transition rules */ }
+.repeated-item.ng-leave { /* transition rules */ }</code></pre>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-17">
+    <section class="slide-content"><h3 id="react">React</h3>
+<ul>
+<li>Heavily inspired in <code>ngAnimate</code>, also relies on CSS classes.</li>
+</ul>
+<pre><code>var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
+var TodoList = React.createClass({
+  render: function() {
+    return (
+      &lt;div&gt;
+        &lt;button onClick={this.handleAdd}&gt;Add Item&lt;/button&gt;
+        &lt;ReactCSSTransitionGroup transitionName=&quot;example&quot;&gt;
+          {items}
+        &lt;/ReactCSSTransitionGroup&gt;
+      &lt;/div&gt;
+    );
+  }
+});</code></pre>
+<pre><code>.example-enter { /* item added to the DOM */ }
+.example-leave { /* item removed from the DOM */ }</code></pre>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-18">
     <section class="slide-content"><h2 id="-can-transition-"><code>can-transition</code></h2>
 <ul>
 <li>A &#39;syntax shortcut&#39; to define the same animation behavior for a group of states.</li>
@@ -740,7 +820,7 @@ Con: Route definition in template</p>
 &lt;/can-transition&gt;</code></pre>
 </section>
   </div>
-  <div class="slide hidden" id="slide-14">
+  <div class="slide hidden" id="slide-19">
     <section class="slide-content"><h2 id="-can-transition-"><code>can-transition</code></h2>
 <ul>
 <li>Defining a custom target</li>
@@ -754,7 +834,7 @@ Con: Route definition in template</p>
 &lt;/can-transition&gt;</code></pre>
 </section>
   </div>
-  <div class="slide hidden" id="slide-15">
+  <div class="slide hidden" id="slide-20">
     <section class="slide-content"><h2 id="templating">Templating</h2>
 <h3 id="stache-mustache">Stache / Mustache</h3>
 <h4 id="the-good">The Good</h4>
@@ -763,7 +843,7 @@ Con: Route definition in template</p>
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-16">
+  <div class="slide hidden" id="slide-21">
     <section class="slide-content"><h3 id="stache-mustache">Stache / Mustache</h3>
 <h4 id="the-bad">The Bad</h4>
 <ol>
@@ -780,7 +860,7 @@ Con: Route definition in template</p>
 </ol>
 </section>
   </div>
-  <div class="slide hidden" id="slide-17">
+  <div class="slide hidden" id="slide-22">
     <section class="slide-content"><h3 id="html-based-templates">HTML-based Templates</h3>
 <h4 id="the-good">The Good</h4>
 <ul>
@@ -795,7 +875,7 @@ Con: Route definition in template</p>
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-18">
+  <div class="slide hidden" id="slide-23">
     <section class="slide-content"><h3 id="-key-"><code>{{key}}</code></h3>
 <ul>
 <li><code>{{key}}</code> - Angular</li>
@@ -803,7 +883,7 @@ Con: Route definition in template</p>
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-19">
+  <div class="slide hidden" id="slide-24">
     <section class="slide-content"><h3 id="-each-"><code>{{#each}}</code></h3>
 <h4 id="them">Them</h4>
 <ul>
@@ -821,7 +901,7 @@ Con: Route definition in template</p>
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-20">
+  <div class="slide hidden" id="slide-25">
     <section class="slide-content"><h3 id="-if-if-"><code>{{#if}} / {{^if}}</code></h3>
 <ul>
 <li><code>if=&quot;expr&quot;</code> - Same problem as repeat</li>
@@ -834,7 +914,7 @@ Con: Route definition in template</p>
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-21">
+  <div class="slide hidden" id="slide-26">
     <section class="slide-content"><h3 id="exporting-component-s-viewmodel">Exporting component&#39;s viewModel</h3>
 <p><a href="https://github.com/bitovi/canjs/issues/1362">Issue #1362</a></p>
 <ul>
@@ -852,7 +932,7 @@ Con: Route definition in template</p>
 </ul>
 </section>
   </div>
-  <div class="slide hidden" id="slide-22">
+  <div class="slide hidden" id="slide-27">
     <section class="slide-content"></section>
   </div>
 
