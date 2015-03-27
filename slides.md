@@ -10,7 +10,12 @@ logo: theme/logo.png
 
 --
 
-## An intro slide
+## Problems to Solve
+
+* Bootstrapping Application
+* Make routing easier
+* Transitioning between pages
+* Allow Components to be Written into DOM
 
 --
 
@@ -218,3 +223,7 @@ if(can.route.attr('page') === 'index') {
 * `[@viewModel]="name"` -extract full vm (`[@events]="todosEvents"`)
 
 --
+
+## Implementing Templates
+
+
